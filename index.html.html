@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MossIsle – light-sound-time | Make the unperceivable, perceivable</title>
+<style>
+    /* 全局變數與現代化極簡排版設定 */
+    :root {
+        --ks-green: #009E74;
+        --ks-green-hover: #008763;
+        --text-dark: #1D1D1F;
+        --text-gray: #86868B;
+        --border-light: #E5E5EA;
+        --bg-main: #FFFFFF;
+        --bg-card: #F8FBF9; 
+        --accent-gold: #F4C542; 
+    }
+    
+    /* 平滑滾動與防遮擋 */
+    html {
+        scroll-behavior: smooth;
+        scroll-padding-top: 80px; 
+    }
+
+    body { 
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+        margin: 0; 
+        padding: 0; 
+        color: var(--text-dark); 
+        background-color: var(--bg-main); 
+        -webkit-font-smoothing: antialiased;
+    }
+
+    /* 頂部警告橫幅 */
+    .top-banner {
+        background-color: #F0F0FE;
+        color: #3B3B98;
+        text-align: center;
+        padding: 12px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    /* 首屏核心區 */
+    .hero-container { max-width: 1200px; margin: 40px auto; padding: 0 40px; }
+    .hero-header { text-align: center; margin-bottom: 40px; }
+    .hero-header h1 { font-size: 28px; font-weight: 700; margin-bottom: 12px; letter-spacing: -0.5px; }
+    .hero-header p { font-size: 16px; color: var(--text-gray); }
+
+    .hero-content { display: flex; gap: 40px; }
+    .hero-video { flex: 1.8; border-radius: 12px; overflow: hidden; background: #000; position: relative; padding-top: 40%; }
+    .hero-video video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+    
+    .hero-stats { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+    .stat-bar-container { margin-bottom: 24px; }
+    .stat-progress { height: 4px; background: var(--border-light); border-radius: 2px; overflow: hidden; margin-bottom: 12px; }
+    .stat-progress-fill { height: 100%; width: 100%; background: var(--ks-green); }
+    .stat-number { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+    .stat-label { font-size: 14px; color: var(--text-gray); margin-bottom: 24px; }
+    
+    .btn-pledge { background: var(--ks-green); color: #FFF; border: none; padding: 18px; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.2s; text-align: center; width: 100%; display: block; text-decoration: none; }
+    .btn-pledge:hover { background: var(--ks-green-hover); }
+
+    /* 懸浮導航條 */
+    .sticky-nav {
+        position: sticky; top: 0; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
+        border-top: 1px solid var(--border-light); border-bottom: 1px solid var(--border-light);
+        z-index: 1000; padding: 0 40px; display: flex; height: 60px; justify-content: space-between; align-items: center;
+    }
+    .nav-tabs { display: flex; gap: 32px; font-size: 14px; font-weight: 600; align-items: center; height: 100%; }
+    .nav-tabs a { color: var(--text-gray); text-decoration: none; height: 100%; display: flex; align-items: center; position: relative; transition: 0.2s; }
+    .nav-tabs a.active { color: var(--text-dark); }
+    .nav-tabs a.active::after { content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 3px; background-color: var(--text-dark); }
+
+    /* 主體三欄佈局 */
+    .main-container { max-width: 1200px; margin: 40px auto; padding: 0 40px; display: flex; gap: 40px; align-items: flex-start; }
+
+    /* 左側菜單 (支援獨立滾動) */
+    .left-menu { 
+        width: 240px; /* 稍微加寬以容納較長的英文標題 */
+        position: sticky; 
+        top: 100px; 
+        flex-shrink: 0; 
+        max-height: calc(100vh - 120px); 
+        overflow-y: auto; 
+        padding-right: 10px;
+    }
+    .left-menu::-webkit-scrollbar { width: 4px; }
+    .left-menu::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 4px; }
+
+    .left-menu ul { list-style: none; padding: 0; margin: 0; border-left: 2px solid var(--border-light); }
+    .left-menu li { margin-bottom: 8px; }
+    .left-menu li a { display: block; padding: 6px 0 6px 16px; color: var(--text-gray); text-decoration: none; font-size: 13px; font-weight: 600; line-height: 1.4; transition: 0.2s; margin-left: -2px; border-left: 2px solid transparent; }
+    .left-menu li a:hover, .left-menu li a.active { color: var(--text-dark); border-left-color: var(--ks-green); }
+
+    /* 中間故事長圖區 */
+    .story-content { flex-grow: 1; min-width: 0; }
+    .story-content h2 { font-size: 24px; font-weight: 700; margin-bottom: 30px; letter-spacing: -0.5px; }
+    .story-content img { width: 100%; display: block; margin: 0; padding: 0; border: none; vertical-align: middle; }
+
+    /* 右側方案檔位區 */
+    .right-rewards { width: 340px; flex-shrink: 0; position: sticky; top: 100px; max-height: calc(100vh - 120px); overflow-y: auto; padding-right: 10px; }
+    .right-rewards::-webkit-scrollbar { width: 4px; }
+    .right-rewards::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 4px; }
+
+    .reward-card { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 12px; padding: 24px; margin-bottom: 24px; transition: 0.3s; cursor: pointer; position: relative; }
+    .reward-card:hover { border-color: var(--ks-green); box-shadow: 0 8px 24px rgba(0,0,0,0.06); transform: translateY(-2px); }
+    
+    .badge { display: inline-block; padding: 4px 10px; font-size: 11px; font-weight: 700; border-radius: 4px; margin-bottom: 12px; letter-spacing: 0.5px; text-transform: uppercase; }
+    .badge-standard { background: #E5E5EA; color: var(--text-dark); }
+    .badge-vip { background: var(--accent-gold); color: #FFF; text-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+    
+    .reward-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; line-height: 1.3; }
+    .reward-price { font-size: 22px; font-weight: 700; color: var(--ks-green); margin-bottom: 16px; }
+    .reward-price span { font-size: 14px; color: var(--text-gray); text-decoration: line-through; font-weight: 500; margin-left: 6px; }
+    .reward-desc { font-size: 14px; color: #48484A; line-height: 1.6; margin-bottom: 20px; }
+    
+    .reward-includes-title { font-size: 13px; font-weight: 700; margin-bottom: 8px; text-transform: uppercase; color: var(--text-gray); }
+    .reward-list { list-style: none; padding: 0; margin: 0; font-size: 13px; color: #48484A; line-height: 1.8; }
+    .reward-list li::before { content: "•"; color: var(--ks-green); margin-right: 6px; font-weight: bold; }
+
+    @media (max-width: 1024px) {
+        .left-menu, .right-rewards { display: none; }
+        .hero-content, .main-container { flex-direction: column; padding: 0 20px; }
+        .hero-video { padding-top: 56.25%; width: 100%; }
+        .sticky-nav { padding: 0 20px; }
+        .nav-tabs { display: none; }
+    }
+</style>
+</head>
+<body>
+
+<div class="top-banner">ⓘ 此專案已在 八月 22 成功募資。</div>
+
+<div class="hero-container">
+    <div class="hero-header">
+        <h1>MossIsle – light-sound-time | Make the unperceivable, perceivable</h1>
+        <p>A self-sustaining desktop ecosystem that blends soothing light, nature, and intuitive control.</p>
+    </div>
+
+    <div class="hero-content">
+        <div class="hero-video">
+            <video src="6.mp4" autoplay loop muted playsinline controls poster="YOUR_POSTER.jpg"></video>
+        </div>
+        <div class="hero-stats">
+            <div class="stat-progress"><div class="stat-progress-fill"></div></div>
+            
+            <div class="stat-number">$198,845</div>
+            <div class="stat-label">已認繳 (總目標 $ 5,000)</div>
+            
+            <div class="stat-number" style="color:var(--text-dark);">955</div>
+            <div class="stat-label">名支持者</div>
+            
+            <a href="#" class="btn-pledge">支持這個專案</a>
+        </div>
+    </div>
+</div>
+
+<div class="sticky-nav">
+    <div class="nav-tabs">
+        <a href="#" class="active">宣傳活動</a>
+        <a href="#">常見問題 <span style="font-size:12px; margin-left:4px; color:var(--ks-green);">14</span></a>
+        <a href="#">更新</a>
+        <a href="#">留言</a>
+    </div>
+</div>
+
+<div class="main-container">
+    
+    <aside class="left-menu">
+        <ul>
+            <li><a href="#slice-1" class="active">01 MossIsle: Light · Sound · Time</a></li>
+            <li><a href="#slice-2">02 The Invisible Void</a></li>
+            <li><a href="#slice-3">03 What If We Could?</a></li>
+            <li><a href="#slice-4">04 Four Senses, Amplified</a></li>
+            <li><a href="#slice-5">05 Emotion Light · Living Loop</a></li>
+            <li><a href="#slice-6">06 An Amazing Camera</a></li>
+            <li><a href="#slice-7">07 Time Compressed</a></li>
+            <li><a href="#slice-8">08 Exclusive App: Track Your Progress</a></li>
+            <li><a href="#slice-9">09 Time Expanded</a></li>
+            <li><a href="#slice-10">10 No Buttons. No Screen. Three Gestures.</a></li>
+            <li><a href="#slice-11">11 Self-Sustaining Ecosystem</a></li>
+            <li><a href="#slice-12">12 What You Touch. What It Hides.</a></li>
+            <li><a href="#slice-13">13 Your Life & Our Research</a></li>
+            <li><a href="#slice-14">14 Product Specs: How It Works</a></li>
+            <li><a href="#slice-15">15 Why MossIsle?</a></li>
+            <li><a href="#slice-16">16 Super Early Bird</a></li>
+            <li><a href="#slice-17">17 Back This Project</a></li>
+        </ul>
+    </aside>
+
+    <main class="story-content">
+        <h2>背景故事</h2>
+        
+        <img id="slice-1" src="(1).png" alt="01 MossIsle: Light · Sound · Time">
+        <img id="slice-2" src="(2).png" alt="02 The Invisible Void">
+        <img id="slice-3" src="(3).png" alt="03 What If We Could?">
+        <img id="slice-4" src="(4).png" alt="04 Four Senses, Amplified">
+        <img id="slice-5" src="(5).png" alt="05 Emotion Light · Living Loop">
+        <img id="slice-6" src="(6).png" alt="06 An Amazing Camera">
+        <img id="slice-7" src="(7).png" alt="07 Time Compressed">
+        <img id="slice-8" src="(8).png" alt="08 Exclusive App: Track Your Progress">
+        <img id="slice-9" src="(9).png" alt="09 Time Expanded">
+        <img id="slice-10" src="(10).png" alt="10 No Buttons. No Screen. Three Gestures.">
+        <img id="slice-11" src="(11).png" alt="11 Self-Sustaining Ecosystem">
+        <img id="slice-12" src="(12).png" alt="12 What You Touch. What It Hides.">
+        <img id="slice-13" src="(13).png" alt="13 Your Life & Our Research">
+        <img id="slice-14" src="(14).png" alt="14 Product Specs: How It Works">
+        <img id="slice-15" src="(15).png" alt="15 Why MossIsle?">
+        <img id="slice-16" src="(16).png" alt="16 Super Early Bird">
+        <img id="slice-17" src="(17).png" alt="17 Back This Project">
+    </main>
+
+    <aside class="right-rewards">
+        <h3 style="font-size: 20px; font-weight: bold; margin-bottom: 24px; text-transform: uppercase; color: var(--text-gray); letter-spacing: 0.5px;">支持</h3>
+
+        <div class="reward-card">
+            <span class="badge badge-standard">KS Select Glow</span>
+            <div class="reward-title">MossIsle + Accessories Bundle (Super Early Bird)</div>
+            <div class="reward-price">$215 <span>$280</span></div>
+            <div class="reward-desc">The perfect middle ground. For those who want premium features without committing to bundles.</div>
+            <div class="reward-includes-title">Includes:</div>
+            <ul class="reward-list">
+                <li>1× MossIsle (any color choice)</li>
+                <li>1× Terracotta or Plastic Pot</li>
+                <li>1× Floral Ring</li>
+                <li>1× HydroVolt™ Booster</li>
+            </ul>
+        </div>
+
+        <div class="reward-card">
+            <span class="badge badge-vip">VIP Glow Duo Pack</span>
+            <div class="reward-title">Double the brilliance (VIP Only)</div>
+            <div class="reward-price">$299 <span>$584</span></div>
+            <div class="reward-desc">Save 49% off the Total Retail Value. Perfect for styling multiple spaces or sharing the magic of MossIsle, all while staying part of our VIP inner circle.</div>
+            <div class="reward-includes-title">Includes:</div>
+            <ul class="reward-list">
+                <li>2× MossIsle (any color choices)</li>
+                <li>2× Terracotta or Plastic Pots</li>
+                <li>2× Floral Rings</li>
+                <li>2× HydroVolt™ Boosters</li>
+            </ul>
+        </div>
+    </aside>
+
+</div>
+
+</body>
+</html>
